@@ -1,0 +1,58 @@
+﻿@using ScratchWorld.ViewModels
+@model AddDataViewModel
+
+<head>
+    <link rel="stylesheet" href="/css/User.css">
+</head>
+
+<form asp-action="AddData">
+    <div class="container">
+        <div class="row">
+            <div class="card">
+                <div class="card-body pb-0">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <div class="border-end">
+                                <div class="text-center ">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="img-fluid avatar-xxl rounded-circle" alt="">
+                                </div>
+                                
+                                    <div class="form-group">
+                                    <label class="text-muted mt-3" for=" email">User name:</label>
+                                    <input asp-for="UserName" type="text" class="form-control mb-2" placeholder="Enter new User name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="text-muted" for=" email">Name:</label>
+                                    <input asp-for="Name" type="text" class="form-control mb-3" placeholder="Enter new name">
+                                    </div>
+                                
+                            </div>
+                        </div><!-- end col -->
+                        <div class="col-md-6">
+                            <div class="ms-3">
+                                <div>
+                                    <h4 class="card-title mb-5 mt-4">User page</h4>
+                                </div>
+                                <div class="row my-4">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="text-muted" for="phone">Phone:</label>
+                                            <input asp-for="PhoneNumber" type="text" class="form-control mb-2" placeholder="Enter new phone">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="text-muted" for="age">Age:</label>
+                                            <input asp-for="Age" type="number" class="form-control mb-2" placeholder="Enter new age">
+                                        </div>
+                                    </div><!-- end col -->
+                                </div><!-- end row -->
+                            </div>
+                        </div><!-- end col -->
+                        <div class="col-md-3 text-center">
+                            <button type="submit" class="btn btn-outline-primary">Save changes</button>
+                        </div>
+                    </div><!-- end row -->
+                </div><!-- end card body -->
+            </div><!-- end card -->
+        </div>
+    </div>
+</form>
