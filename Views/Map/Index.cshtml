@@ -48,6 +48,7 @@
         }
 
         .info {
+            text-align:center;
             padding: 6px 8px;
             font: 14px/16px Arial, Helvetica, sans-serif;
             background: white;
@@ -87,6 +88,11 @@
           apiKey: apiKey
         }).addTo(map);
 
+        const geojson = L.geoJson(ukraineData, {
+            style,
+            onEachFeature
+        }).addTo(map);
+
         //function getColor(d) {
         //    return d > 1000 ? '#800026' :
         //        d > 500 ? '#BD0026' :
@@ -124,25 +130,50 @@
             info.update(layer.feature.properties);
         }
 
-        const geojson = L.geoJson(ukraineData, {
-            style,
-            onEachFeature
-        }).addTo(map);
-
         function resetHighlight(e) {
             geojson.resetStyle(e.target);
             info.update();
         }
 
-        function zoomToFeature(e) {
-            map.fitBounds(e.target.getBounds());
+        //function zoomToFeature(e) {
+        //    map.fitBounds(e.target.getBounds());
+        //}
+        //function popupForm(e){
+        //    e.bindPopup();
+        //}
+        //geojson.eachLayer(function (layer) {
+        //    layer.bindPopup(layer.feature.properties.name);
+        //});
+        // Функция для создания содержимого попапа
+        function createPopupContent(layer) {
+            return `
+                <div>
+                    <h4>${layer.feature.properties.name}</h4>
+                    <p>Выберите цвет:</p>
+                    <button onclick="changeColor('${layer._leaflet_id}', 'red')">Красный</button>
+                    <button onclick="changeColor('${layer._leaflet_id}', 'green')">Зеленый</button>
+                    <button onclick="changeColor('${layer._leaflet_id}', 'blue')">Синий</button>
+                </div>
+            `;
         }
+
+        // Функция для изменения цвета слоя
+        function changeColor(layerId, color) {
+            var layer = geojson.getLayer(layerId);
+            layer.setStyle({ fillColor: color, fillOpacity: 0.5 });
+        }
+
+        // Создание GeoJSON слоя и привязка попапа
+        geojson.eachLayer(function (layer) {
+            layer.bindPopup(createPopupContent(layer));
+        });
+        //map.fitBounds(geojson.getBounds());
 
         function onEachFeature(feature, layer) {
             layer.on({
                 mouseover: highlightFeature,
                 mouseout: resetHighlight,
-                click: zoomToFeature
+                //click: zoomToFeature
             });
         }
 
@@ -157,7 +188,7 @@
         // method that we will use to update the control based on feature properties passed
         info.update = function (props) {
             this._div.innerHTML = '<h4>Oblast name</h4>' + (props ?
-                '<b>' + props.name + '</b>'
+                '<b>' + props['name:en'] + '</b>'
                 : 'Hover over a oblast');
         };
 
