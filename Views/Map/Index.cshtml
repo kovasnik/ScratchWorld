@@ -72,27 +72,27 @@
     <script type="text/javascript" src="geoJSON/ukr-obl.js"></script>
 
     <script type="text/javascript">
-
+        
         const map = L.map("map", {
           minZoom: 2
         })
 
         map.setView([49.0139, 31.2858], 6.5);
-        //map.setView([37.8, -96], 4);
 
         const apiKey = "AAPK32e2ea9121ef44c19b708ad308e51a07ZcHvl99KO2dLUl7io6C5JwKdC14dNus9o_hFSiJgzyodwYZI7-nqSG7XEuh9vDX-";
 
         const basemapEnum = "arcgis/streets";
-
         L.esri.Vector.vectorBasemapLayer(basemapEnum, {
           apiKey: apiKey
         }).addTo(map);
-
+        //L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //    maxZoom: 19,
+        //    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        //}).addTo(map);
         const geojson = L.geoJson(ukraineData, {
             style,
             onEachFeature
         }).addTo(map);
-
         //function getColor(d) {
         //    return d > 1000 ? '#800026' :
         //        d > 500 ? '#BD0026' :
@@ -106,12 +106,12 @@
 
         function style(feature) {
             return {
-                fillColor: 'blue',
+                fillColor: 'white',
                 weight: 2,
                 opacity: 1,
                 color: 'white',
                 dashArray: '3',
-                fillOpacity: 0.7
+                fillOpacity: 0.5
             };
         }
 
@@ -131,20 +131,19 @@
         }
 
         function resetHighlight(e) {
+            var currentColor = e.target.options.fillColor;
             geojson.resetStyle(e.target);
+            e.target.setStyle({ fillColor: currentColor });
             info.update();
         }
 
-        //function zoomToFeature(e) {
-        //    map.fitBounds(e.target.getBounds());
-        //}
-        //function popupForm(e){
-        //    e.bindPopup();
-        //}
-        //geojson.eachLayer(function (layer) {
-        //    layer.bindPopup(layer.feature.properties.name);
-        //});
-        // Функция для создания содержимого попапа
+        function zoomToFeature(e) {
+            map.fitBounds(e.target.getBounds());
+        }
+        geojson.eachLayer(function (layer) {
+            layer.bindPopup(layer.feature.properties.name);
+        });
+
         function createPopupContent(layer) {
             return `
                 <div>
@@ -160,12 +159,13 @@
         // Функция для изменения цвета слоя
         function changeColor(layerId, color) {
             var layer = geojson.getLayer(layerId);
-            layer.setStyle({ fillColor: color, fillOpacity: 0.5 });
+            layer.setStyle({ fillColor: color, fillOpacity: 0.7 });
         }
 
         // Создание GeoJSON слоя и привязка попапа
         geojson.eachLayer(function (layer) {
             layer.bindPopup(createPopupContent(layer));
+            console.log(layer._leaflet_id);
         });
         //map.fitBounds(geojson.getBounds());
 
@@ -173,7 +173,7 @@
             layer.on({
                 mouseover: highlightFeature,
                 mouseout: resetHighlight,
-                //click: zoomToFeature
+                click: zoomToFeature
             });
         }
 
@@ -193,7 +193,6 @@
         };
 
         info.addTo(map);
-
     </script>
 
 </body>

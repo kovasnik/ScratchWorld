@@ -10,6 +10,8 @@ namespace ScratchWorld.Data
             : base(options) { }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Region> Regions { get; set; }
+        public DbSet<RegionSettings> RegionSettings { get; set; }
     }
 
 }
