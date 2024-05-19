@@ -10,6 +10,7 @@ namespace ScratchWorld.ViewModels
         public int? ColorPalette { get; set; }
         public int? Status { get; set; }
         public string Name { get; set; }
+        public string UkrName { get; set; }
         public string Coordinates { get; set; }
     }
 }
