@@ -18,6 +18,15 @@ namespace ScratchWorld.Data.Repository
             return await _context.RegionSettings.Where(c => c.UserId == userId).ToListAsync();
         }
 
+        public async Task<RegionSettings?> GetByRegionId(RegionSettings regionSettings)
+        {
+            return await _context.RegionSettings.FirstOrDefaultAsync(c => c.RegionId == regionSettings.RegionId);
+        }
+        public async Task<RegionSettings?> GetByRegionIdNoTracking(RegionSettings regionSettings)
+        {
+            return await _context.RegionSettings.AsNoTracking().FirstOrDefaultAsync(c => c.RegionId == regionSettings.RegionId && c.UserId == regionSettings.UserId);
+        }
+
         public bool Save()
         {
             var saved = _context.SaveChanges();

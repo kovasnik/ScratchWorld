@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ScratchWorld.Data.Interfaces;
 using ScratchWorld.Models;
 using ScratchWorld.ViewModels;
@@ -34,6 +35,7 @@ namespace ScratchWorld.Controllers
                     var setting = regionsSettings?.FirstOrDefault(s => s.RegionId == region.Id);
                     var mapViewModel = new MapViewModel()
                     {
+                        RegionId = region.Id,
                         Name = region.Name,
                         UkrName = region.UkrName,
                         Coordinates = region.Coordinates,
@@ -44,10 +46,37 @@ namespace ScratchWorld.Controllers
                 }
                 index++;
             }
-            //var jsonResult = JsonConvert.SerializeObject(result);
             var jsonResult = JsonConvert.SerializeObject(result);
             ViewBag.RegionsJson = jsonResult;
             return View();
+        }
+
+        [HttpPost]
+        [Route("Map/Index")]
+        public async Task<IActionResult> Index([FromBody] MapViewModel json)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            //MapViewModel mapViewModel = JsonConvert.DeserializeObject<MapViewModel>(json);
+            var regionSettings = new RegionSettings()
+            {
+                RegionId = json.RegionId,
+                UserId = user.Id,
+                ColorPalette = json.ColorPalette,
+                Status = json.Status
+            };
+            var region = await _regionSettingsRepository.GetByRegionIdNoTracking(regionSettings);
+            
+            if (region == null)
+            {
+                _regionSettingsRepository.Add(regionSettings);
+            }
+            else
+            {
+                regionSettings.Id = region.Id;
+                _regionSettingsRepository.Update(regionSettings);
+            }
+            
+            return Ok(new { success = true, message = "Region status updated successfully" });
         }
     }
 }

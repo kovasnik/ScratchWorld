@@ -62,6 +62,19 @@
                 margin: 0 0 5px;
                 color: #777;
             }
+
+        .legend {
+            line-height: 18px;
+            color: #555;
+        }
+
+            .legend i {
+                width: 18px;
+                height: 18px;
+                float: left;
+                margin-right: 8px;
+                opacity: 0.7;
+            }
     </style>
 
 </head>
@@ -97,6 +110,7 @@
         const geoJsonFeatures = regions.map(region => ({
             type: "Feature",
             properties: {
+                regionId: region.RegionId,
                 name: region.Name,
                 ukrName: region.UkrName,
                 colorPalette: region.ColorPalette,
@@ -161,43 +175,58 @@
             layer.on({
                 mouseover: highlightFeature,
                 mouseout: resetHighlight,
-                click: zoomToFeature
+                click: openForm
             });
         }
 
         //============================form 
-        var form = L.control();
+        function openForm(e) {
+            const layer = e.target;
+
+            const formHtml = `
+                    <div class="form-popup" id="myForm">
+                        <h3>${layer.feature.properties.name}</h3>
+                        <button onclick="changeColor(1, '${layer._leaflet_id}')">Red</button>
+                        <button onclick="changeColor(2, '${layer._leaflet_id}')">Blue</button>
+                        <button onclick="changeColor(3, '${layer._leaflet_id}')">Green</button>
+                        <button onclick="changeColor(0, '${layer._leaflet_id}')">White</button>
+                    </div>
+                `;
+
+            L.popup()
+                .setLatLng(e.latlng)
+                .setContent(formHtml)
+                .openOn(map);
+        }
+
+        function changeColor(status, layerId) {
+            const layer = geojson.getLayer(layerId);
+
+            layer.feature.properties.status = status;
+            layer.setStyle(style(layer.feature));
+            console.log(layer);
+
+            const payload = {
+                regionId: layer.feature.properties.regionId,
+                colorPalette: layer.feature.properties.colorPalette,
+                status: status
+            };
+            const payloadString = JSON.stringify(payload);
+            console.log("Sending JSON payload: ", JSON.stringify(payload));
+
+            fetch('https://localhost:7178/Map/Index', {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json'
+                 },
+                 body: JSON.stringify(payload)
+             }).then(response => response.json())
+             .then(data => console.log(data))
+             .catch(error => console.error('Error:', error));
+
+            map.closePopup();
+        }
         
-
-        //============================Popup
-
-        //geojson.eachLayer(function (layer) {
-        //    layer.bindPopup(layer.feature.properties.name);
-        //});
-
-        //function createPopupContent(layer) {
-        //    return `
-        //        <div>
-        //            <h4>${layer.feature.properties.name}</h4>
-        //            <p>Выберите цвет:</p>
-        //            <button onclick="changeColor('${layer._leaflet_id}', 'red')">Красный</button>
-        //            <button onclick="changeColor('${layer._leaflet_id}', 'green')">Зеленый</button>
-        //            <button onclick="changeColor('${layer._leaflet_id}', 'blue')">Синий</button>
-        //        </div>
-        //    `;
-        //}
-
-        //function changeColor(layerId, color) {
-        //    var layer = geojson.getLayer(layerId);
-        //    layer.setStyle({ fillColor: color, fillOpacity: 0.7 });
-        //}
-
-        //geojson.eachLayer(function (layer) {
-        //    layer.bindPopup(createPopupContent(layer));
-        //    console.log(layer._leaflet_id);
-        //});
-        //map.fitBounds(geojson.getBounds());
-
         //===========================info
         var info = L.control();
 
@@ -214,6 +243,27 @@
         };
 
         info.addTo(map);
+
+        //=============================legend
+        var legend = L.control({ position: 'bottomright' });
+        legend.onAdd = function (map) {
+            var div = L.DomUtil.create('div', 'info legend'),
+                grades = [0, 1, 2, 3],
+                labels = [];
+            for (var i = 0; i < grades.length; i++) {
+                if (grades[i] == 0) {
+                    div.innerHTML += '<i style="background:' + getColor(grades[i]) + '"></i> ' + 'Not interested<br>';
+                } else if (grades[i] == 1) {
+                    div.innerHTML += '<i style="background:' + getColor(grades[i]) + '"></i> ' + 'Want to visit<br>';
+                } else if (grades[i] == 2) {
+                    div.innerHTML += '<i style="background:' + getColor(grades[i]) + '"></i> ' + 'Living in<br>';
+                } else if (grades[i] == 3) {
+                    div.innerHTML += '<i style="background:' + getColor(grades[i]) + '"></i> ' + 'Visited<br>';
+                }
+            }
+            return div;
+        };
+        legend.addTo(map);
     </script>
 
 </body>
