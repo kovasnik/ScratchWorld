@@ -102,8 +102,16 @@ namespace ScratchWorld.Controllers
             {
                 return View("Error");
             }
-
-            user.Email = userEditViewModel.Email;
+            var userEmail = await _userManager.FindByEmailAsync(userEditViewModel.Email);
+            if(user.Email != userEmail.Email)
+            {
+                if (userEmail != null)
+                {
+                    ViewBag.Error = "User with this email adres already exists";
+                    return View(userEditViewModel);
+                }
+                user.Email = userEditViewModel.Email;
+            }
             //await _userManager.UpdateAsync(user);
             var passwordChek = await _userManager.CheckPasswordAsync(user, userEditViewModel.OldPassword);
             if (passwordChek)

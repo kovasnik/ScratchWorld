@@ -23,6 +23,7 @@ namespace ScratchWorld.Controllers
 
         public async Task<IActionResult> Index()
         {
+            ViewBag.HideFooter = true;
             var user = await _userManager.GetUserAsync(User);
             var regions = await _regionRepository.GetAll();
             var regionsSettings = await _regionSettingsRepository.GetUsersRegions(user.Id);
