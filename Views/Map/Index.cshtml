@@ -80,7 +80,7 @@
 </head>
 
 <body>
-    <div class="mapcontainer"><div id="map"></div></div>
+    <div class="mapcontainer "><div id="map"></div></div>
 
     <script type="text/javascript" src="geoJSON/FullUkr.js"></script>
     <script type="text/javascript" src="geoJSON/ukr-obl.js"></script>
@@ -184,13 +184,13 @@
             const layer = e.target;
 
             const formHtml = `
-                    <div class="form-popup" id="myForm">
-                        <h3>${layer.feature.properties.name}</h3>
-                        <button onclick="changeColor(1, '${layer._leaflet_id}')">Red</button>
-                        <button onclick="changeColor(2, '${layer._leaflet_id}')">Blue</button>
-                        <button onclick="changeColor(3, '${layer._leaflet_id}')">Green</button>
-                        <button onclick="changeColor(0, '${layer._leaflet_id}')">White</button>
-                    </div>
+                            <div class="form-popup text-center" id="myForm">
+                                <h3>${layer.feature.properties.name}</h3>
+                                <button class="mb-2 mx-auto" onclick="changeColor(1, '${layer._leaflet_id}')">Want to visit</button></br>
+                                <button class="mb-2" onclick=class="mb-2""changeColor(2, '${layer._leaflet_id}')">Living in</button></br>
+                                <button class="mb-2" onclick="changeColor(3, '${layer._leaflet_id}')">Visited country</button></br>
+                                <button class="mb-2" onclick="changeColor(0, '${layer._leaflet_id}')">Not interested</button></br>
+                            </div>
                 `;
 
             L.popup()

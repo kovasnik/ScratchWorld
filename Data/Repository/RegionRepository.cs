@@ -13,15 +13,15 @@ namespace ScratchWorld.Data.Repository
             _context = context;
         }
 
-        public bool Add(RegionSettings regionSettings)
+        public bool Add(Region region)
         {
-            _context.Add(regionSettings);
+            _context.Add(region);
             return Save();
         }
 
-        public bool Delete(RegionSettings regionSettings)
+        public bool Delete(Region region)
         {
-            _context.Remove(regionSettings);
+            _context.Remove(region);
             return Save();
         }
 
@@ -36,9 +36,9 @@ namespace ScratchWorld.Data.Repository
             return saved > 0;
         }
 
-        public bool Update(RegionSettings regionSettings)
+        public bool Update(Region region)
         {
-            _context.Update(regionSettings);
+            _context.Update(region);
             return Save();
         }
     }
