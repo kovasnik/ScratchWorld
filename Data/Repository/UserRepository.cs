@@ -1,4 +1,5 @@
-﻿using ScratchWorld.Data.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using ScratchWorld.Data.Interfaces;
 using ScratchWorld.Models;
 
 namespace ScratchWorld.Data.Repository
@@ -29,6 +30,11 @@ namespace ScratchWorld.Data.Repository
         {
             _context.Add(user);
             return Save();
+        }
+
+        public async Task<IEnumerable<User>> GetAll()
+        {
+            return await _context.Users.ToListAsync();
         }
     }
 }
