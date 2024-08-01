@@ -13,8 +13,5 @@ namespace ScratchWorld.Models
 
         [Column("age")]
         public int Age { get; set; }
-       
-        [Column("map_id")]
-        public int? MapId { get; set; }
     }
 }

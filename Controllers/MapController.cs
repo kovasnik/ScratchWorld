@@ -33,15 +33,15 @@ namespace ScratchWorld.Controllers
             {
                 if (index < regions.Count() - 1)
                 {
-                    var setting = regionsSettings?.FirstOrDefault(s => s.RegionId == region.Id);
+                    var settings = regionsSettings?.FirstOrDefault(s => s.RegionId == region.Id);
                     var mapViewModel = new MapViewModel()
                     {
                         RegionId = region.Id,
                         Name = region.Name,
                         UkrName = region.UkrName,
                         Coordinates = region.Coordinates,
-                        ColorPalette = setting?.ColorPalette ?? 0,
-                        Status = setting?.Status ?? 0
+                        ColorPalette = settings?.ColorPalette ?? 0,
+                        Status = settings?.Status ?? 0
                     };
                     result.Add(mapViewModel);
                 }
