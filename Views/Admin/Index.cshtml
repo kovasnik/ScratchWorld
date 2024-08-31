@@ -2,11 +2,80 @@
 @model IEnumerable<Region> 
 
 
-@foreach(var region in Model)
+@*@foreach(var region in Model)
 {
     <ul class="list-group">
         <li class="list-group-item">@region.Name</li>
         <li class="list-group-item">@region.UkrName</li>
-        @*<li class="list-group-item">@region.Coordinates</li>*@
+        @*<li class="list-group-item">@region.Coordinates</li>
     </ul>
-}
+}*@
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showContent('userInfo')">User Info</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showContent('regionInfo')">Region Info</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showContent('landmarkInfo')">Landmark Info</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                <div id="content">
+                    <div id="userInfo" class="content-section">
+                        <h2>User Information</h2>
+                        <button class="btn btn-primary" onclick="handleAction('addUser')">Add User</button>
+                        <button class="btn btn-secondary" onclick="handleAction('editUser')">Edit User</button>
+                        <button class="btn btn-danger" onclick="handleAction('deleteUser')">Delete User</button>
+                        <!-- User Info Content -->
+                    </div>
+                    <div id="regionInfo" class="content-section" style="display: none;">
+                        <h2>Region Information</h2>
+                        <button class="btn btn-primary" onclick="handleAction('addRegion')">Add Region</button>
+                        <button class="btn btn-secondary" onclick="handleAction('editRegion')">Edit Region</button>
+                        <button class="btn btn-danger" onclick="handleAction('deleteRegion')">Delete Region</button>
+                        <!-- Region Info Content -->
+                    </div>
+                    <div id="landmarkInfo" class="content-section" style="display: none;">
+                        <h2>Landmark Information</h2>
+                        <button class="btn btn-primary" onclick="handleAction('addLandmark')">Add Landmark</button>
+                        <button class="btn btn-secondary" onclick="handleAction('editLandmark')">Edit Landmark</button>
+                        <button class="btn btn-danger" onclick="handleAction('deleteLandmark')">Delete Landmark</button>
+                        <!-- Landmark Info Content -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function showContent(sectionId) {
+            // Hide all content sections
+            document.querySelectorAll('.content-section').forEach(function (section) {
+                section.style.display = 'none';
+            });
+
+            // Show the selected section
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        function handleAction(action) {
+            // Placeholder function to handle actions
+            alert('Action: ' + action);
+        }
+    </script>
+</body>

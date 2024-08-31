@@ -13,6 +13,8 @@ namespace ScratchWorld.Models
         public string Name { get; set; }
         [Column("description")]
         public string Description { get; set; }
+        [Column("coordinates")]
+        public  string Coordinates { get; set; }
         [ForeignKey("RegionId")]
         [Column("region_id")]
         public int RegionId { get; set; }

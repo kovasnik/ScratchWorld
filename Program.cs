@@ -12,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
+builder.Services.AddScoped<ILandmarkRepository, LandmarkRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IRegionSettingsRepository, RegionSettingsRepository>();
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
