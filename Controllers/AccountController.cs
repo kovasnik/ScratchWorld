@@ -8,7 +8,7 @@ namespace ScratchWorld.Controllers
 {
     public class AccountController : Controller
     {
-        RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager)

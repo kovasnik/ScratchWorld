@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ScratchWorld.BLL.Interfaces;
+using ScratchWorld.BLL.Services;
 using ScratchWorld.Data;
 using ScratchWorld.Data.Interfaces;
 using ScratchWorld.Data.Repository;
@@ -15,6 +17,9 @@ builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<ILandmarkRepository, LandmarkRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IRegionSettingsRepository, RegionSettingsRepository>();
+
+builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
     option.UseNpgsql(builder.Configuration.GetConnectionString("ScratchWorldDb"));
