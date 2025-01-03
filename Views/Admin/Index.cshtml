@@ -1,5 +1,55 @@
 ﻿@using ScratchWorld.Models
-@model IEnumerable<Region> 
+@model IEnumerable<Region>
+
+
+@*<div class="admin-panel">
+    <button id="loadUsers">Пользователи</button>
+    <button id="loadRegions">Регионы</button>
+    <button id="loadMarkers">Метки</button>
+</div>
+
+<div id="contentArea">
+    <!-- Здесь будут отображаться данные -->
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        // Функция для отправки запроса на сервер
+        function loadData(status) {
+            $.ajax({
+                url: '/YourController/YourAction', // Замените на ваш маршрут
+                type: 'GET',
+                data: { status: status },
+                success: function (response) {
+                    // Обновляем содержимое div с полученными данными
+                    $('#contentArea').html(response);
+                },
+                error: function () {
+                    $('#contentArea').html('<p>Произошла ошибка при загрузке данных.</p>');
+                }
+            });
+        }
+
+        // Обработчики событий для кнопок
+        $('#loadUsers').click(function () {
+            loadData(1); // 1 - статус для пользователей
+        });
+
+        $('#loadRegions').click(function () {
+            loadData(2); // 2 - статус для регионов
+        });
+
+        $('#loadMarkers').click(function () {
+            loadData(3); // 3 - статус для меток
+        });
+    });
+</script>*@
+
+
+
+
+
 
 
 @*@foreach(var region in Model)

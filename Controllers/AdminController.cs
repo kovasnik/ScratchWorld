@@ -8,17 +8,31 @@ namespace ScratchWorld.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IRegionRepository _regionRepository;
         private readonly ILandmarkRepository _landmarkRepository;
-        public AdminController(IUserRepository userRepository, IRegionRepository regionRepository) 
+        public AdminController(IUserRepository userRepository, IRegionRepository regionRepository)
         {
             _regionRepository = regionRepository;
             _userRepository = userRepository;
         }
         public async Task<IActionResult> Index()
         {
-            //var users = await _userRepository.GetAll();
-            var regions = await _regionRepository.GetAll();
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Index(int status)
+        {
+            if (status == 0)
+            {
+                var users = await _userRepository.GetAll();
+                return View(users);
+            }
+            else if (status == 1)
+            {
+                var regions = await _regionRepository.GetAll();
+                return View(regions);
+            }
             var landmarks = await _landmarkRepository.GetAll();
-            return View(regions);
+            return View(landmarks);
         }
     }
 }
