@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ScratchWorld.BLL.Interfaces;
-using ScratchWorld.Data;
-using ScratchWorld.Models;
 using ScratchWorld.ViewModels;
 
 namespace ScratchWorld.Controllers

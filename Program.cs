@@ -10,7 +10,7 @@ using ScratchWorld.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add repositores to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
@@ -18,8 +18,10 @@ builder.Services.AddScoped<ILandmarkRepository, LandmarkRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IRegionSettingsRepository, RegionSettingsRepository>();
 
+// Add services to the container.
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IMapService, MapService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
