@@ -37,6 +37,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var accountService = scope.ServiceProvider.GetRequiredService<IAccountService>();
+    await accountService.SeedRolesAsync();
+}
+
 //if (args.Length == 1 && args[0].ToLower() == "seeddata")
 //{
 //    //Seed.SeedData(app);

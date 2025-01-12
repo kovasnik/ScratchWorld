@@ -22,6 +22,8 @@ namespace ScratchWorld.Models
         [ForeignKey("LandmarkId")]
         [Column("landmark_id")]
         public int? LandmarkId { get; set; }
+        [Column("parent_comment")]
+        public int ParentComment { get; set; }
         public User? User { get; set; }
         public Region? Region { get; set; }
         public Landmark? Landmark { get; set; }

@@ -18,10 +18,14 @@ namespace ScratchWorld.BLL.Services
             _roleManager = roleManager;
             _userManager = userManager;
             _signInManager = signInManager;
+        }
 
-            if (_roleManager.RoleExistsAsync(UserRoles.Admin) == null)
+        public async Task SeedRolesAsync()
+        {
+            if (await _roleManager.RoleExistsAsync(UserRoles.Admin) == null)
                 _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
-            if (_roleManager.RoleExistsAsync(UserRoles.User) == null)
+
+            if (await _roleManager.RoleExistsAsync(UserRoles.User) == null)
                 _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
         }
 
