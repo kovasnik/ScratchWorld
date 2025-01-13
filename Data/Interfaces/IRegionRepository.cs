@@ -5,12 +5,11 @@ namespace ScratchWorld.Data.Interfaces
     public interface IRegionRepository
     {
         Task<IEnumerable<Region>> GetAll();
-        bool Add(Region region);
+        Task<IEnumerable<Region>> GetLikedAsync(IEnumerable<int> regionIds);
+        Task AddAsync(Region region);
 
-        bool Update(Region region);
+        Task UpdateAsync(Region region);
 
-        bool Delete(Region region);
-
-        bool Save();
+        Task DeleteAsync(Region region);
     }
 }

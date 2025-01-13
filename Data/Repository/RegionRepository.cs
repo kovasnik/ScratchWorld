@@ -13,16 +13,16 @@ namespace ScratchWorld.Data.Repository
             _context = context;
         }
 
-        public bool Add(Region region)
+        public async Task AddAsync(Region region)
         {
-            _context.Add(region);
-            return Save();
+            await _context.AddAsync(region);
+            await _context.SaveChangesAsync();
         }
 
-        public bool Delete(Region region)
+        public async Task DeleteAsync(Region region)
         {
             _context.Remove(region);
-            return Save();
+            await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Region>> GetAll()
@@ -30,16 +30,19 @@ namespace ScratchWorld.Data.Repository
             return await _context.Regions.ToListAsync();
         }
 
-        public bool Save()
+        public async Task<IEnumerable<Region>> GetLikedAsync(IEnumerable<int> regionIds)
         {
-            var saved = _context.SaveChanges();
-            return saved > 0;
+            var regions = await _context.Regions
+                .Where(l => regionIds.Contains(l.Id))
+                .ToListAsync();
+
+            return regions;
         }
 
-        public bool Update(Region region)
+        public async Task UpdateAsync(Region region)
         {
             _context.Update(region);
-            return Save();
+            await _context.SaveChangesAsync();
         }
     }
 }

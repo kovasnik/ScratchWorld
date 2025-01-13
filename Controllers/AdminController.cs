@@ -31,8 +31,7 @@ namespace ScratchWorld.Controllers
                 var regions = await _regionRepository.GetAll();
                 return View(regions);
             }
-            var landmarks = await _landmarkRepository.GetAll();
-            return View(landmarks);
+            return View();
         }
     }
 }

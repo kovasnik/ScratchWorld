@@ -12,33 +12,41 @@ namespace ScratchWorld.Data.Repository
         {
             _context = context;
         }
-        public bool Add(Landmark landmark)
+        public async Task AddAsync(Landmark landmark)
         {
-            _context.Add(landmark);
-            return Save();
+            await _context.AddAsync(landmark);
+            await _context.SaveChangesAsync();
         }
 
-        public bool Delete(Landmark landmark)
+        public async Task DeleteAsync(Landmark landmark)
         {
             _context.Remove(landmark);
-            return Save();
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Landmark>> GetAll()
+        public async Task<IEnumerable<Landmark>> GetAllAsync()
         {
             return await _context.Landmarks.ToListAsync();
         }
 
-        public bool Save()
+        public async Task<IEnumerable<Landmark>> GetApprovedAsync()
         {
-            var saved = _context.SaveChanges();
-            return saved > 0;
+            return await _context.Landmarks.Where(l => l.IsApproved == true).ToListAsync();
         }
 
-        public bool Update(Landmark landmark)
+        public async Task<IEnumerable<Landmark>> GetLikedAsync(IEnumerable<int> landmarkIds)
+        {
+            var landmarks = await _context.Landmarks
+                .Where(l => landmarkIds.Contains(l.Id))
+                .ToListAsync();
+
+            return landmarks;
+        }
+
+        public async Task UpdateAsync(Landmark landmark)
         {
             _context.Update(landmark);
-            return Save();
+            await _context.SaveChangesAsync();
         }
     }
 }

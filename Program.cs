@@ -17,6 +17,7 @@ builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<ILandmarkRepository, LandmarkRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IRegionSettingsRepository, RegionSettingsRepository>();
+builder.Services.AddScoped<ILikeRepository, LikesRepository>();
 
 // Add services to the container.
 builder.Services.AddScoped<IUserService, UserService>();

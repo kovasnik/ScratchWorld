@@ -4,10 +4,11 @@ namespace ScratchWorld.Data.Interfaces
 {
     public interface ILandmarkRepository
     {
-        bool Add(Landmark landmark);
-        bool Update(Landmark landmark);
-        bool Delete(Landmark landmark);
-        Task<IEnumerable<Landmark>> GetAll();
-        bool Save();
+        Task AddAsync(Landmark landmark);
+        Task UpdateAsync(Landmark landmark);
+        Task DeleteAsync(Landmark landmark);
+        Task<IEnumerable<Landmark>> GetAllAsync();
+        Task<IEnumerable<Landmark>> GetApprovedAsync();
+        Task<IEnumerable<Landmark>> GetLikedAsync(IEnumerable<int> landmarkIds);
     }
 }

@@ -74,12 +74,12 @@ namespace ScratchWorld.BLL.Services
 
             if (existingRegion == null)
             {
-                _regionSettingsRepository.Add(regionSettings);
+                await _regionSettingsRepository.AddAsync(regionSettings);
             }
             else
             {
                 regionSettings.Id = existingRegion.Id;
-                _regionSettingsRepository.Update(regionSettings);
+                await _regionSettingsRepository.UpdateAsync(regionSettings);
             }
         }
     }
