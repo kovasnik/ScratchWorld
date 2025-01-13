@@ -1,52 +1,55 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ScratchWorld.Data.Interfaces;
-using ScratchWorld.Models;
+using ScratchWorld.BLL.Interfaces;
 using ScratchWorld.ViewModels;
+using System.Security.Claims;
 
 namespace ScratchWorld.Controllers
 {
     public class UserController : Controller
     {
-        private readonly UserManager<User> _userManager;
-        private readonly IUserRepository _userRepository;
-        public UserController(UserManager<User> userManager, IUserRepository userRepository)
+        private readonly IUserService _userService;
+        public UserController(IUserService userService)
         {
-            _userManager = userManager;
-            _userRepository = userRepository;
+            _userService = userService;
         }
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User);
-            var detailViewModel = new DetailViewModel()
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
             {
-                UserName = user.UserName,
-                Email = user.Email,
-                Age = user.Age,
-                Name = user.Name,
-                PhoneNumber = user.PhoneNumber,
-            };
-            return View(detailViewModel);
+                return View("Error");
+            }
+
+            try
+            {
+                var detailViewModel = await _userService.GetUserDetailsAsync(userId);
+                return View(detailViewModel);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                ViewBag.Error = ex.Message;
+                return View("Error");
+            }
         }
 
         [Authorize]
         public async Task<IActionResult> AddData()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return View("Error");
+
+            try
             {
+                var addDataViewModel = await _userService.GetUserAddDataViewModelAsync(userId);
+                return View(addDataViewModel);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                ViewBag.Error = ex.Message;
                 return View("Error");
             }
-
-            var addDataViewModel = new AddDataViewModel()
-            {
-                UserName = user.UserName,
-                Age = user.Age,
-                Name = user.Name,
-                PhoneNumber = user.PhoneNumber,
-            };
-            return View(addDataViewModel);
         }
 
         [Authorize]
@@ -58,34 +61,45 @@ namespace ScratchWorld.Controllers
                 ModelState.AddModelError("", "Failed to edit profile");
                 return View("AddData", addDataViewModel);
             }
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return View("Error");
-            }
 
-            user.Name = addDataViewModel.UserName;
-            user.Age = addDataViewModel.Age;
-            user.Name = addDataViewModel.Name;
-            user.PhoneNumber = addDataViewModel.PhoneNumber;
-            await _userManager.UpdateAsync(user);
-            return RedirectToAction("Index", "User");   
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return View("Error");
+
+            try
+            {
+                await _userService.UpdateUserDataAsync(userId, addDataViewModel);
+                return RedirectToAction("Index");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                ViewBag.Error = ex.Message;
+                return View(addDataViewModel);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ViewBag.Error = ex.Message;
+                return View(addDataViewModel);
+            }
         }
 
         [Authorize]
         public async Task<IActionResult> EditUser()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return View("Error");
+
+            try
             {
+                var userEditViewModel = await _userService.GetUserEditViewModelAsync(userId);
+                return View(userEditViewModel);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                ViewBag.Error = ex.Message;
                 return View("Error");
             }
-
-            var userEditViewModel = new UserEditViewModel()
-            {
-                Email = user.Email,
-            };
-            return View(userEditViewModel);
         }
 
         [Authorize]
@@ -97,30 +111,30 @@ namespace ScratchWorld.Controllers
                 ModelState.AddModelError("", "Failed to edit profile");
                 return View("EditUser", userEditViewModel);
             }
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
                 return View("Error");
-            }
-            var userEmail = await _userManager.FindByEmailAsync(userEditViewModel.Email);
-            if(user.Email != userEmail.Email)
+
+            try
             {
-                if (userEmail != null)
-                {
-                    ViewBag.Error = "User with this email adres already exists";
-                    return View(userEditViewModel);
-                }
-                user.Email = userEditViewModel.Email;
+                var result = await _userService.UpdateUserEmailAndPasswordAsync(userId, userEditViewModel);
+                if (result)
+                    return RedirectToAction("Index");
+
+                ModelState.AddModelError("", "Failed to update email or password");
+                return View(userEditViewModel);
             }
-            //await _userManager.UpdateAsync(user);
-            var passwordChek = await _userManager.CheckPasswordAsync(user, userEditViewModel.OldPassword);
-            if (passwordChek)
+            catch (ArgumentException ex)
             {
-                await _userManager.ChangePasswordAsync(user, userEditViewModel.OldPassword, userEditViewModel.Password);
-                return RedirectToAction("Index", "User");
+                ViewBag.Error = ex.Message;
+                return View(userEditViewModel);
             }
-            ViewBag.Error = "Old password is not correct";
-            return View(userEditViewModel);
+            catch (InvalidOperationException ex)
+            {
+                ViewBag.Error = ex.Message;
+                return View(userEditViewModel);
+            }
         }
     }
 }

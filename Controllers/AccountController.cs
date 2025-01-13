@@ -1,25 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using ScratchWorld.Data;
-using ScratchWorld.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using ScratchWorld.BLL.Interfaces;
 using ScratchWorld.ViewModels;
 
 namespace ScratchWorld.Controllers
 {
     public class AccountController : Controller
     {
-        RoleManager<IdentityRole> _roleManager;
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager)
+        private readonly IAccountService _accountService;
+
+        public AccountController(IAccountService accountService)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _roleManager = roleManager;
-            if (_roleManager.RoleExistsAsync(UserRoles.Admin) == null)
-                _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
-            if (_roleManager.RoleExistsAsync(UserRoles.User) == null)
-                _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+            _accountService = accountService;
         }
 
         public IActionResult Index()
@@ -34,29 +25,28 @@ namespace ScratchWorld.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel loginModel)
+        public async Task<IActionResult> Login(LoginViewModel loginView)
         {
-            if (!ModelState.IsValid) return View(loginModel);
-            
-            var user = await _userManager.FindByEmailAsync(loginModel.Email);
-            
-            if (user != null)
-            {
-                var passwordChek = await _userManager.CheckPasswordAsync(user, loginModel.Password);
-                if (passwordChek)
-                {
-                    var result = await _signInManager.PasswordSignInAsync(user, loginModel.Password, false, false);
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
+            if (!ModelState.IsValid) return View(loginView);
 
+            try
+            {
+                var isLoginSuccessful = await _accountService.LoginAsync(loginView);
+
+                if (!isLoginSuccessful)
+                {
+                    ViewBag.Error = "Password or email is incorrect";
+                    return View(loginView);
                 }
-                ViewBag.Error = "Password is not correct";
-                return View(loginModel);
             }
-            ViewBag.Error = "User not found";
-            return View(loginModel);
+            catch (InvalidOperationException)
+            {
+                ViewBag.Error = "Something went wrong. Please try again later.";
+                return View(loginView);
+            }
+           
+
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Register()
@@ -66,38 +56,36 @@ namespace ScratchWorld.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterVeiwModel registerModel)
+        public async Task<IActionResult> Register(RegisterVeiwModel registerView)
         {
-            if (!ModelState.IsValid) return View(registerModel);
-            var user = await _userManager.FindByEmailAsync(registerModel.Email);
-            if (user != null)
+            if (!ModelState.IsValid) return View(registerView);
+
+            try
             {
-                ViewBag.Error = "User with this email adres already exists";
-                return View(registerModel);
+                var registerResult = await _accountService.RegisterAsync(registerView);
+                if (!registerResult.Succeeded)
+                {
+                    ViewBag.Error = "Registration failed. Please check your data.";
+                    return View(registerView);
+                }
+
+            }
+            catch (ArgumentException ex)
+            {
+                ViewBag.Error = ex.Message;
+            }
+            catch (InvalidOperationException)
+            {
+                ViewBag.Error = "Something went wrong. Please try again later.";
+                return View(registerView);
             }
 
-            var newUser = new User()
-            {
-                Email = registerModel.Email,
-                UserName = registerModel.UserName,
-                Age = registerModel.Age
-            };
-            var newUserResponse = await _userManager.CreateAsync(newUser, registerModel.Password);
-            if (newUserResponse.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(newUser, UserRoles.User);
-            }
-            else
-            {
-                ViewBag.Error = "Bad password. Try Latin letters with digits";
-                return View(registerModel);
-            }
             return RedirectToAction("Index", "Home");
         }
 
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            await _accountService.LogoutAsync();
             return RedirectToAction("Index", "Home");
         }
     }

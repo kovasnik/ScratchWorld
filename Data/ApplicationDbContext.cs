@@ -15,6 +15,7 @@ namespace ScratchWorld.Data
         public DbSet<RegionSettings> RegionSettings { get; set; }
         public DbSet<Landmark> Landmarks { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Likes> Likes { get; set; }
 
     }
 

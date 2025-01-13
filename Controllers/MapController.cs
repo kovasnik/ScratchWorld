@@ -1,83 +1,53 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using ScratchWorld.Data.Interfaces;
-using ScratchWorld.Models;
+using ScratchWorld.BLL.Interfaces;
 using ScratchWorld.ViewModels;
 
 namespace ScratchWorld.Controllers
 {
     public class MapController : Controller
     {
-        private readonly UserManager<User> _userManager;
-        private readonly IRegionRepository _regionRepository;
-        private readonly IRegionSettingsRepository _regionSettingsRepository;
+        private readonly IMapService _mapService;
 
-        public MapController(UserManager<User> userManager, IRegionRepository regionRepository, IRegionSettingsRepository regionSettingsRepository)
+        public MapController(IMapService mapService)
         {
-            _userManager = userManager;
-            _regionRepository = regionRepository;
-            _regionSettingsRepository = regionSettingsRepository;
+            _mapService = mapService;
         }
 
         public async Task<IActionResult> Index()
         {
             ViewBag.HideFooter = true;
-            var user = await _userManager.GetUserAsync(User);
-            var regions = await _regionRepository.GetAll();
-            var regionsSettings = await _regionSettingsRepository.GetUsersRegions(user.Id);
-            List<MapViewModel> result = new List<MapViewModel>();
-            int index = 0;
-            foreach (var region in regions)
+            try
             {
-                if (index < regions.Count() - 1)
-                {
-                    var settings = regionsSettings?.FirstOrDefault(s => s.RegionId == region.Id);
-                    var mapViewModel = new MapViewModel()
-                    {
-                        RegionId = region.Id,
-                        Name = region.Name,
-                        UkrName = region.UkrName,
-                        Coordinates = region.Coordinates,
-                        ColorPalette = settings?.ColorPalette ?? 0,
-                        Status = settings?.Status ?? 0
-                    };
-                    result.Add(mapViewModel);
-                }
-                index++;
+                var result = await _mapService.GetRegionsForUserAsync(User);
+                var jsonResult = JsonConvert.SerializeObject(result);
+                ViewBag.RegionsJson = jsonResult;
+                return View();
             }
-            var jsonResult = JsonConvert.SerializeObject(result);
-            ViewBag.RegionsJson = jsonResult;
-            return View();
+            catch (InvalidOperationException ex)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
         }
 
         [HttpPost]
         [Route("Map/Index")]
         public async Task<IActionResult> Index([FromBody] MapViewModel json)
         {
-            var user = await _userManager.GetUserAsync(User);
-            //MapViewModel mapViewModel = JsonConvert.DeserializeObject<MapViewModel>(json);
-            var regionSettings = new RegionSettings()
+            try
             {
-                RegionId = json.RegionId,
-                UserId = user.Id,
-                ColorPalette = json.ColorPalette,
-                Status = json.Status
-            };
-            var region = await _regionSettingsRepository.GetByRegionIdNoTracking(regionSettings);
-            
-            if (region == null)
-            {
-                _regionSettingsRepository.Add(regionSettings);
+                await _mapService.UpdateRegionForUserAsync(User, json);
+                return Ok(new { success = true, message = "Region status updated successfully" });
             }
-            else
+            catch (InvalidOperationException ex)
             {
-                regionSettings.Id = region.Id;
-                _regionSettingsRepository.Update(regionSettings);
+                return RedirectToAction("Index", "Home");
             }
-            
-            return Ok(new { success = true, message = "Region status updated successfully" });
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
         }
     }
 }

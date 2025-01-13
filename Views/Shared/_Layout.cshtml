@@ -11,62 +11,74 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ScratchWorld.styles.css" asp-append-version="true" />
-    <style>.navcontainer {display: flex; margin-right: auto; margin-left: auto;}</style>
+    <style>
+        .navbar {
+            background-color: #5BA199;
+            width: 100%;
+            margin: 0;
+        }
+
+            .navbar a.nav-link, .navbar .navbar-brand {
+                color: #E5E3E4;
+                text-decoration: none;
+                transition: color 0.3s;
+            }
+
+                .navbar a.nav-link:hover, .navbar .navbar-brand:hover {
+                    color: #DDBEAA;
+                }
+
+        .navcontainer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            width: 100%;
+            height: 4%;
+        }
+
+        .navbar-brand {
+            margin-right: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-left: auto;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-0">
-            <div class="navcontainer justify-content-center">
+        <nav class="navbar navbar-expand-sm navbar-light">
+            <div class="navcontainer">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ScratchWorld</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-@*                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>*@
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">About Product</a>
-                        </li>
-                                         
-                        @if (SignInManager.IsSignedIn(User))
-                        {
-                            var user = await UserManager.GetUserAsync(User);
-                            @if (await UserManager.IsInRoleAsync(user, "Admin"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Admin</a>
-                                </li>
-                            }
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Map" asp-action="Index">Map</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">User</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Registration</a>
-                            </li>
-                        }
 
-                    </ul>
+                <div class="nav-links">
+                    <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">About Product</a>
+
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        var user = await UserManager.GetUserAsync(User);
+                        if (await UserManager.IsInRoleAsync(user, "Admin"))
+                        {
+                            <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Index">Admin</a>
+                        }
+                        <a class="nav-link" asp-area="" asp-controller="Map" asp-action="Index">Map</a>
+                        <a class="nav-link" asp-area="" asp-controller="User" asp-action="Index">User</a>
+                        <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+                    }
+                    else
+                    {
+                        <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                        <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Register">Registration</a>
+                    }
                 </div>
             </div>
         </nav>
     </header>
     <div class="">
-        <main role="main" class="pb-3">
+        <main role="main" class="">
             @RenderBody()
         </main>
     </div>

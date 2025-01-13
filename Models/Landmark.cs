@@ -18,6 +18,8 @@ namespace ScratchWorld.Models
         [ForeignKey("RegionId")]
         [Column("region_id")]
         public int RegionId { get; set; }
+        [Column("is_approved")]
+        public bool IsApproved {  get; set; }
         public Region? Region { get; set; }
     }
 }

@@ -27,27 +27,22 @@ namespace ScratchWorld.Data.Repository
             return await _context.RegionSettings.AsNoTracking().FirstOrDefaultAsync(c => c.RegionId == regionSettings.RegionId && c.UserId == regionSettings.UserId);
         }
 
-        public bool Save()
-        {
-            var saved = _context.SaveChanges();
-            return saved > 0;
-        }
-
-        public bool Update(RegionSettings regionSettings)
+        public async Task UpdateAsync(RegionSettings regionSettings)
         {
             _context.Update(regionSettings);
-            return Save();
+            await _context.SaveChangesAsync();
         }
-        public bool Add(RegionSettings regionSettings)
+        public async Task AddAsync(RegionSettings regionSettings)
         {
-            _context.Add(regionSettings);
-            return Save();
+            await _context.AddAsync(regionSettings);
+            await _context.SaveChangesAsync();
         }
 
-        public bool Delete(RegionSettings regionSettings)
+        public async Task DeleteAsync(RegionSettings regionSettings)
         {
             _context.Remove(regionSettings);
-            return Save();
+            await _context.SaveChangesAsync();
+
         }
     }
 }

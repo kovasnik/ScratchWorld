@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ScratchWorld.BLL.Interfaces;
+using ScratchWorld.BLL.Services;
 using ScratchWorld.Data;
 using ScratchWorld.Data.Interfaces;
 using ScratchWorld.Data.Repository;
@@ -8,13 +10,20 @@ using ScratchWorld.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add repositores to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<ILandmarkRepository, LandmarkRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IRegionSettingsRepository, RegionSettingsRepository>();
+builder.Services.AddScoped<ILikeRepository, LikesRepository>();
+
+// Add services to the container.
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IMapService, MapService>();
+
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
     option.UseNpgsql(builder.Configuration.GetConnectionString("ScratchWorldDb"));
@@ -28,6 +37,12 @@ builder.Services.AddSession();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var accountService = scope.ServiceProvider.GetRequiredService<IAccountService>();
+    await accountService.SeedRolesAsync();
+}
 
 //if (args.Length == 1 && args[0].ToLower() == "seeddata")
 //{

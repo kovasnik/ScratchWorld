@@ -6,7 +6,7 @@ namespace ScratchWorld.Data.Repository
 {
     public class UserRepository : IUserRepository
     {
-        public  ApplicationDbContext _context { get; set; }
+        private readonly ApplicationDbContext _context;
         public UserRepository(ApplicationDbContext context) 
         {
             _context = context;
