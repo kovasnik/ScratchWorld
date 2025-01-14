@@ -16,6 +16,8 @@ namespace ScratchWorld.ViewModels
         [Required]
         public int RegionId { get; set; }
         [Required]
-        public bool IsApproved { get; set; }
+        public bool IsShated { get; set; }
+        [Required]
+        public string UserId { get; set; }
     }
 }

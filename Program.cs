@@ -23,6 +23,7 @@ builder.Services.AddScoped<ILikeRepository, LikesRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IMapService, MapService>();
+builder.Services.AddScoped<ILandmarkService, LandmarkService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
