@@ -25,7 +25,7 @@ namespace ScratchWorld.BLL.Services
             {
                 Id = landmarkViewModel.Id,
                 Name = landmarkViewModel.Name,
-                Description = landmarkViewModel.Description,
+                Description = landmarkViewModel.Description ?? "",
                 Coordinates = landmarkViewModel.Coordinates,
                 IsApproved = false,
                 IsShared = landmarkViewModel.IsShated,
