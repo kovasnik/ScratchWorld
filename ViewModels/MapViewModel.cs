@@ -4,7 +4,7 @@ namespace ScratchWorld.ViewModels
 {
     public class MapViewModel
     {
-        //public int Id { get; set; }
+        public int Id { get; set; }
         public string UserId { get; set; }
         public int RegionId { get; set; }
         public int? ColorPalette { get; set; }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ScratchWorld.BLL.Interfaces;
@@ -14,12 +15,15 @@ namespace ScratchWorld.BLL.Services
         private readonly UserManager<User> _userManager;
         private readonly IRegionRepository _regionRepository;
         private readonly IRegionSettingsRepository _regionSettingsRepository;
+        private readonly IMapper _mapper;
 
-        public MapService(UserManager<User> userManager, IRegionRepository regionRepository, IRegionSettingsRepository regionSettingsRepository)
+        public MapService(UserManager<User> userManager, IRegionRepository regionRepository, 
+            IRegionSettingsRepository regionSettingsRepository, IMapper mapper)
         {
             _userManager = userManager;
             _regionRepository = regionRepository;
             _regionSettingsRepository = regionSettingsRepository;
+            _mapper = mapper;
         }
 
         public async Task<List<MapViewModel>> GetRegionsForUserAsync(ClaimsPrincipal user)
@@ -29,30 +33,19 @@ namespace ScratchWorld.BLL.Services
                 throw new InvalidOperationException("User is not authorized");
 
 
-            var regions = await _regionRepository.GetAll();
+            var regions = await _regionRepository.GetRegions();
             var regionsSettings = await _regionSettingsRepository.GetUsersRegions(currentUser.Id);
-            List<MapViewModel> result = new();
+            
+            var result = _mapper.Map<List<MapViewModel>>(regions);
 
-            int index = 0;
-            foreach (var region in regions)
+            foreach (var region in result)
             {
-                if (index < regions.Count() - 1)
-                {
-                    var settings = regionsSettings?.FirstOrDefault(s => s.RegionId == region.Id);
-                    var mapViewModel = new MapViewModel()
-                    {
-                        RegionId = region.Id,
-                        Name = region.Name,
-                        UkrName = region.UkrName,
-                        Coordinates = region.Coordinates,
-                        ColorPalette = settings?.ColorPalette ?? 0,
-                        Status = settings?.Status ?? 0
-                    };
+                var settings = regionsSettings?.FirstOrDefault(s => s.RegionId == region.Id);
 
-                    result.Add(mapViewModel);
-                }
-                index++;
+                region.ColorPalette = settings?.ColorPalette ?? 0;
+                region.Status = settings?.Status ?? 0;
             }
+
             return result;
         }
 

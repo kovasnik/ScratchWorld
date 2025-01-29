@@ -39,6 +39,12 @@ namespace ScratchWorld.Data.Repository
             return regions;
         }
 
+        public async Task<IEnumerable<Region>> GetRegions()
+        {
+            var regions = await _context.Regions.ToListAsync();
+            return regions.Take(regions.Count - 1);
+        }
+
         public async Task UpdateAsync(Region region)
         {
             _context.Update(region);

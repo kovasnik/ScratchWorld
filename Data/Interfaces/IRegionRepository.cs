@@ -5,6 +5,7 @@ namespace ScratchWorld.Data.Interfaces
     public interface IRegionRepository
     {
         Task<IEnumerable<Region>> GetAll();
+        Task<IEnumerable<Region>> GetRegions();
         Task<IEnumerable<Region>> GetLikedAsync(IEnumerable<int> regionIds);
         Task AddAsync(Region region);
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using ScratchWorld.BLL.Interfaces;
 using ScratchWorld.Models;
 using ScratchWorld.ViewModels;
@@ -8,9 +9,11 @@ namespace ScratchWorld.BLL.Services
     public class UserService : IUserService
     {
         private readonly UserManager<User> _userManager;
-        public UserService(UserManager<User> userManager) 
+        private readonly IMapper _mapper;
+        public UserService(UserManager<User> userManager, IMapper mapper) 
         {
             _userManager = userManager;
+            _mapper = mapper;
         }
 
         public async Task<AddDataViewModel> GetUserAddDataViewModelAsync(string userId)
@@ -18,13 +21,7 @@ namespace ScratchWorld.BLL.Services
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) throw new KeyNotFoundException("User not found");
 
-            return new AddDataViewModel
-            {
-                UserName = user.UserName,
-                Age = user.Age,
-                Name = user.Name,
-                PhoneNumber = user.PhoneNumber,
-            };
+            return _mapper.Map<AddDataViewModel>(user);
         }
 
         public async Task<DetailViewModel> GetUserDetailsAsync(string userId)
@@ -32,14 +29,7 @@ namespace ScratchWorld.BLL.Services
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) throw new KeyNotFoundException("User not found");
 
-            return new DetailViewModel
-            {
-                UserName = user.UserName,
-                Email = user.Email,
-                Age = user.Age,
-                Name = user.Name,
-                PhoneNumber = user.PhoneNumber,
-            };
+            return _mapper.Map<DetailViewModel>(user);
         }
 
         public async Task<UserEditViewModel> GetUserEditViewModelAsync(string userId)
@@ -58,10 +48,8 @@ namespace ScratchWorld.BLL.Services
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) throw new KeyNotFoundException("User not found");
 
-            user.Name = addDataViewModel.UserName;
-            user.Age = addDataViewModel.Age;
-            user.Name = addDataViewModel.Name;
-            user.PhoneNumber = addDataViewModel.PhoneNumber;
+            _mapper.Map(addDataViewModel, user);
+
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {

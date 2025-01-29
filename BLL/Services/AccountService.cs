@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ScratchWorld.BLL.Interfaces;
 using ScratchWorld.Data;
@@ -12,12 +13,15 @@ namespace ScratchWorld.BLL.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly IMapper _mapper;
 
-        public AccountService(RoleManager<IdentityRole> roleManager, UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountService(RoleManager<IdentityRole> roleManager, UserManager<User> userManager, 
+            SignInManager<User> signInManager, IMapper mapper)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _signInManager = signInManager;
+            _mapper = mapper;
         }
 
         public async Task SeedRolesAsync()
@@ -47,12 +51,7 @@ namespace ScratchWorld.BLL.Services
             var user = await _userManager.FindByEmailAsync(registerView.Email);
             if (user != null) throw new ArgumentException("User with this email already exists");
 
-            var newUser = new User()
-            {
-                Email = registerView.Email,
-                UserName = registerView.UserName,
-                Age = registerView.Age
-            };
+            var newUser = _mapper.Map<User>(registerView);
 
             var newUserResponse = await _userManager.CreateAsync(newUser, registerView.Password);
             if (newUserResponse.Succeeded)

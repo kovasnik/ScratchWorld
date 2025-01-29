@@ -8,12 +8,16 @@ namespace ScratchWorld.Helper
     {
         public MappingProfile()
         {
-            CreateMap<RegisterVeiwModel, User>();
-            CreateMap<LoginViewModel, User>();
+            CreateMap<RegisterVeiwModel, User>()
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
             CreateMap<AddDataViewModel, User>();
+            CreateMap<User, AddDataViewModel>();
             CreateMap<DetailViewModel, User>();
+            CreateMap<User, DetailViewModel>();
             CreateMap<LandmarkViewModel, Landmark>();
-            CreateMap<MapViewModel, Region>();
+            CreateMap<Region, MapViewModel>()
+                .ForMember(dest => dest.ColorPalette, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.Ignore());
 
         }
     }
