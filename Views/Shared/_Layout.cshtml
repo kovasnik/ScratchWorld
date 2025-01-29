@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ScratchWorld</title>
+    <title>ScratchWorld</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ScratchWorld.styles.css" asp-append-version="true" />
@@ -64,7 +64,9 @@
                         {
                             <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Index">Admin</a>
                         }
-                        <a class="nav-link" asp-area="" asp-controller="Map" asp-action="Index">Map</a>
+                        
+                        <a class="nav-link" asp-area="" asp-controller="Map" asp-action="Index">My regions</a>
+                        <a class="nav-link" asp-area="" asp-controller="Landmark" asp-action="Index">My landmarks</a>
                         <a class="nav-link" asp-area="" asp-controller="User" asp-action="Index">User</a>
                         <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
                     }

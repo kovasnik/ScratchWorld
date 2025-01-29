@@ -23,6 +23,9 @@ builder.Services.AddScoped<ILikeRepository, LikesRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IMapService, MapService>();
+builder.Services.AddScoped<ILandmarkService, LandmarkService>();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {

@@ -20,6 +20,12 @@ namespace ScratchWorld.Models
         public int RegionId { get; set; }
         [Column("is_approved")]
         public bool IsApproved {  get; set; }
+        [Column("is_shared")]
+        public bool IsShared { get; set; }
+        [ForeignKey(nameof(User))]
+        [Column("user_id")]
+        public string UserId { get; set; }
+        public User? User { get; set; }
         public Region? Region { get; set; }
     }
 }

@@ -1,0 +1,92 @@
+﻿@using ScratchWorld.ViewModels
+@using Newtonsoft.Json
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Landmark choosing</title>
+
+    <!-- Load Leaflet from CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+    <link rel="stylesheet" href="~/css/map.css" />
+    
+    <style>
+        #sidebar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20%;
+            height: calc(100vh - 6.1vh);
+            background-color: #fff;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            z-index: 1000;
+            overflow-y: auto;
+            margin-top: 6.1vh;
+            display: none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <div class="mapcontainer "><div id="map"></div></div>
+    <div id="sidebar"></div>
+
+    <script type="text/javascript">
+
+        const map = L.map("map", {
+            minZoom: 6
+        })
+
+        map.setView([49.0139, 31.2858], 6.5);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        const landmarksResult = @Html.Raw(ViewBag.LandmarksJson);
+        console.log(landmarksResult)
+        const geoJsonlandmarks = landmarksResult.map(landmark => ({
+            type: "Feature",
+            properties: {
+                id: landmark.Id,
+                name: landmark.Name,
+                regionId: landmark.RegionId,
+                description: landmark.Description,
+                isApproved: landmark.IsApproved,
+                isShared: landmark.IsShared,
+                userId: landmark.UserId
+            },
+            geometry: {
+                type: "Point",
+                coordinates: JSON.parse(landmark.Coordinates)
+            }
+        }));
+
+        const landmarks = L.geoJson(geoJsonlandmarks, {
+        }).addTo(map);
+
+        const sidebar = document.getElementById("sidebar");
+        let currentMarker = null;
+
+        map.on("click", function (e) {
+            const { lat, lng } = e.latlng;
+
+            // Если уже есть временный маркер, убираем его
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            }
+
+            // Создаем маркер в месте клика
+            currentMarker = L.marker([lat, lng]).addTo(map);
+
+            // Показываем боковую панель
+            sidebar.style.display = "flex";
+
+        });
+    </script>
+</body>

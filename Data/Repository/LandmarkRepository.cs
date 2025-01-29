@@ -24,6 +24,11 @@ namespace ScratchWorld.Data.Repository
             await _context.SaveChangesAsync();
         }
 
+        public async Task<Landmark> FindLandmarkByIdAsync(int landmarkId)
+        {
+            return await _context.Landmarks.FindAsync(landmarkId);
+        }
+
         public async Task<IEnumerable<Landmark>> GetAllAsync()
         {
             return await _context.Landmarks.ToListAsync();
@@ -41,6 +46,16 @@ namespace ScratchWorld.Data.Repository
                 .ToListAsync();
 
             return landmarks;
+        }
+
+        public async Task<IEnumerable<Landmark>> GetSharedAsync()
+        {
+            return await _context.Landmarks.Where(l => l.IsShared == true).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Landmark>> GetUsersLandmarksAsync(string userId)
+        {
+            return await _context.Landmarks.Where(l => l.UserId == userId).ToListAsync();
         }
 
         public async Task UpdateAsync(Landmark landmark)

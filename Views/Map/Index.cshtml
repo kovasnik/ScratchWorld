@@ -1,11 +1,10 @@
 ﻿@using ScratchWorld.ViewModels
 @using Newtonsoft.Json
-@*@model List<MapViewModel>*@
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <title>Esri Leaflet Tutorials: Display a map</title>
+    <title>Region choosing</title>
 
     <!-- Load Leaflet from CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
@@ -15,69 +14,8 @@
     <script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
     <script src="https://unpkg.com/esri-leaflet-vector@4.2.3/dist/esri-leaflet-vector.js"></script>
 
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .mapcontainer {
-
-            max-width: 100%;
-            padding: 0;
-        }
-        #map {
-            position: static;
-            top: 0;
-            bottom: 0;
-            right: 0;
-            left: 0;
-            width: 100%;
-            height: calc(100vh - 6.1vh);
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 14px;
-            color: #323232;
-            margin-bottom: 0%;
-        }
-
-        .leaflet-container {
-            height: 400px;
-            width: 600px;
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        .info {
-            text-align:center;
-            padding: 6px 8px;
-            font: 14px/16px Arial, Helvetica, sans-serif;
-            background: white;
-            background: rgba(255,255,255,0.8);
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            border-radius: 5px;
-        }
-
-            .info h4 {
-                margin: 0 0 5px;
-                color: #777;
-            }
-
-        .legend {
-            line-height: 18px;
-            color: #555;
-        }
-
-            .legend i {
-                width: 18px;
-                height: 18px;
-                float: left;
-                margin-right: 8px;
-                opacity: 0.7;
-            }
-    </style>
-
+    <link rel="stylesheet" href="~/css/map.css" />
+    
 </head>
 
 <body>
@@ -87,7 +25,7 @@
     <script type="text/javascript">
         
         const map = L.map("map", {
-          minZoom: 2
+          minZoom: 6
         })
 
         map.setView([49.0139, 31.2858], 6.5);
@@ -120,7 +58,7 @@
                 coordinates: JSON.parse(region.Coordinates) 
             }
         }));
-        
+        console.log(geoJsonFeatures);
         const geojson = L.geoJson(geoJsonFeatures, {
                 style,
                 onEachFeature
@@ -213,7 +151,7 @@
             const payloadString = JSON.stringify(payload);
             console.log("Sending JSON payload: ", JSON.stringify(payload));
 
-            fetch('https://localhost:7178/Map/Index', {
+            fetch('https://localhost:7178/Map', {
                  method: 'POST',
                  headers: {
                      'Content-Type': 'application/json'
@@ -236,9 +174,9 @@
         };
 
         info.update = function (props) {
-            this._div.innerHTML = '<h4>Oblast name</h4>' + (props ?
+            this._div.innerHTML = '<h4>Region name</h4>' + (props ?
                 '<b>' + props.name + '</b>'
-                : 'Hover over a oblast');
+                : 'Hover over a region');
         };
 
         info.addTo(map);
