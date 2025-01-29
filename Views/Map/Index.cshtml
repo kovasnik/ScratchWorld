@@ -1,6 +1,5 @@
 ﻿@using ScratchWorld.ViewModels
 @using Newtonsoft.Json
-@*@model List<MapViewModel>*@
 
 <head>
     <meta charset="utf-8" />
@@ -59,7 +58,7 @@
                 coordinates: JSON.parse(region.Coordinates) 
             }
         }));
-        
+        console.log(geoJsonFeatures);
         const geojson = L.geoJson(geoJsonFeatures, {
                 style,
                 onEachFeature

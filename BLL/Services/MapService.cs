@@ -40,7 +40,7 @@ namespace ScratchWorld.BLL.Services
 
             foreach (var region in result)
             {
-                var settings = regionsSettings?.FirstOrDefault(s => s.RegionId == region.Id);
+                var settings = regionsSettings?.FirstOrDefault(s => s.RegionId == region.RegionId);
 
                 region.ColorPalette = settings?.ColorPalette ?? 0;
                 region.Status = settings?.Status ?? 0;
@@ -49,19 +49,21 @@ namespace ScratchWorld.BLL.Services
             return result;
         }
 
-        public async Task UpdateRegionForUserAsync(ClaimsPrincipal user, MapViewModel mapViewModel)
+        public async Task UpdateRegionForUserAsync(ClaimsPrincipal user, RegionSettingsViewModel viewModel)
         {
             var currentUser = await _userManager.GetUserAsync(user);
             if (currentUser == null)
                 throw new InvalidOperationException("User is not authorized");
 
-            var regionSettings = new RegionSettings()
-            {
-                RegionId = mapViewModel.RegionId,
-                UserId = currentUser.Id,
-                ColorPalette = mapViewModel.ColorPalette,
-                Status = mapViewModel.Status
-            };
+            var regionSettings = _mapper.Map<RegionSettings>(viewModel);
+            regionSettings.UserId = currentUser.Id;
+            //var regionSettings = new RegionSettings()
+            //{
+            //    RegionId = mapViewModel.RegionId,
+            //    UserId = currentUser.Id,
+            //    ColorPalette = mapViewModel.ColorPalette,
+            //    Status = mapViewModel.Status
+            //};
 
             var existingRegion = await _regionSettingsRepository.GetByRegionIdNoTracking(regionSettings);
 

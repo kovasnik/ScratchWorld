@@ -81,7 +81,7 @@ namespace ScratchWorld.BLL.Services
         {
             var landmark = await _landmarkRepository.FindLandmarkByIdAsync(landmarkViewModel.Id);
             landmark.Name = landmarkViewModel.Name;
-            landmark.Description = landmarkViewModel.Description;
+            landmark.Description = landmarkViewModel.Description ?? landmark.Description;
             landmark.Coordinates = landmarkViewModel.Coordinates;
             landmark.IsApproved = false;
             landmark.IsShared = landmarkViewModel.IsShated;

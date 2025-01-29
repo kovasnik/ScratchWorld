@@ -33,7 +33,7 @@ namespace ScratchWorld.Controllers
 
         [HttpPost]
         [Route("Map")]
-        public async Task<IActionResult> Index([FromBody] MapViewModel json)
+        public async Task<IActionResult> Index([FromBody] RegionSettingsViewModel json)
         {
             try
             {
