@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using ScratchWorld.BLL.Interfaces;
 using ScratchWorld.Data.Interfaces;
 using ScratchWorld.Models;
@@ -12,25 +13,20 @@ namespace ScratchWorld.BLL.Services
         private readonly UserManager<User> _userManager;
         private readonly ILandmarkRepository _landmarkRepository;
         private readonly ILikeRepository _likeRepository;
-        public LandmarkService(ILandmarkRepository landmarkRepository, ILikeRepository likeRepository, UserManager<User> userManager)
+        private readonly IMapper _mapper;
+        public LandmarkService(ILandmarkRepository landmarkRepository, ILikeRepository likeRepository, 
+            UserManager<User> userManager, IMapper mapper)
         {
             _landmarkRepository = landmarkRepository;
             _likeRepository = likeRepository;
             _userManager = userManager;
+            _mapper = mapper;
         }
 
         public async Task CreateLandmarkAsync(LandmarkViewModel landmarkViewModel)
         {
-            var newLandmark = new Landmark
-            {
-                Id = landmarkViewModel.Id,
-                Name = landmarkViewModel.Name,
-                Description = landmarkViewModel.Description ?? "",
-                Coordinates = landmarkViewModel.Coordinates,
-                IsApproved = false,
-                IsShared = landmarkViewModel.IsShated,
-                UserId = landmarkViewModel.UserId,
-            };
+            var newLandmark = _mapper.Map<Landmark>(landmarkViewModel);
+
             await _landmarkRepository.AddAsync(newLandmark);
         }
 
@@ -80,12 +76,8 @@ namespace ScratchWorld.BLL.Services
         public async Task UpdateLandmarkAsync(LandmarkViewModel landmarkViewModel)
         {
             var landmark = await _landmarkRepository.FindLandmarkByIdAsync(landmarkViewModel.Id);
-            landmark.Name = landmarkViewModel.Name;
-            landmark.Description = landmarkViewModel.Description ?? landmark.Description;
-            landmark.Coordinates = landmarkViewModel.Coordinates;
-            landmark.IsApproved = false;
-            landmark.IsShared = landmarkViewModel.IsShated;
-            landmark.UserId = landmarkViewModel.UserId;
+
+            _mapper.Map(landmarkViewModel, landmark);
 
             await _landmarkRepository.UpdateAsync(landmark);
         }

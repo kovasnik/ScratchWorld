@@ -26,6 +26,12 @@ namespace ScratchWorld.BLL.Services
             _mapper = mapper;
         }
 
+        public async Task<List<MapViewModel>> GetRegionsAsync()
+        {
+            var regions = await _regionRepository.GetRegions();
+            return _mapper.Map<List<MapViewModel>>(regions);
+        }
+
         public async Task<List<MapViewModel>> GetRegionsForUserAsync(ClaimsPrincipal user)
         {
             var currentUser = await _userManager.GetUserAsync(user);
@@ -57,13 +63,6 @@ namespace ScratchWorld.BLL.Services
 
             var regionSettings = _mapper.Map<RegionSettings>(viewModel);
             regionSettings.UserId = currentUser.Id;
-            //var regionSettings = new RegionSettings()
-            //{
-            //    RegionId = mapViewModel.RegionId,
-            //    UserId = currentUser.Id,
-            //    ColorPalette = mapViewModel.ColorPalette,
-            //    Status = mapViewModel.Status
-            //};
 
             var existingRegion = await _regionSettingsRepository.GetByRegionIdNoTracking(regionSettings);
 

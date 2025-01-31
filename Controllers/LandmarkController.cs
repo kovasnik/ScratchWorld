@@ -10,25 +10,32 @@ namespace ScratchWorld.Controllers
     public class LandmarkController : Controller
     {
         private readonly ILandmarkService _landmarkService;
-        public LandmarkController(ILandmarkService landmarkService)
+        private readonly IMapService _mapService;
+        public LandmarkController(ILandmarkService landmarkService, IMapService mapService)
         {
             _landmarkService = landmarkService;
+            _mapService = mapService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            var regions = await _mapService.GetRegionsAsync();
             var userLanmarks = await _landmarkService.GetUsersLandmarksAsync(User);
-            var jsonResult = JsonConvert.SerializeObject(userLanmarks);
-            ViewBag.LandmarksJson = jsonResult;
+            ViewBag.RegionJson = JsonConvert.SerializeObject(regions);
+            ViewBag.LandmarksJson = JsonConvert.SerializeObject(userLanmarks);
             return View();
         }
 
         [HttpPost("Create")]
         public async Task<IActionResult> CreateLandmark([FromBody] LandmarkViewModel viewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid data" }); 
+            }
             await _landmarkService.CreateLandmarkAsync(viewModel);
-            return View();
+            return Ok(new { message = "Landmark created successfully" });
         }
 
         [HttpPut("Update")]

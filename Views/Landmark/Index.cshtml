@@ -34,7 +34,28 @@
 
 <body>
     <div class="mapcontainer "><div id="map"></div></div>
-    <div id="sidebar"></div>
+    <div id="sidebar">
+        <h3>Add Landmark</h3>
+
+        <form id="landmarkForm">
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name"/>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" ></textarea>
+
+            <label for="coordinates">Coordinates:</label>
+            <input type="text" id="coordinates" name="coordinates" readonly />
+
+            <input type="checkbox" id="isShared" name="isShared" />
+            <label for="isShared">Shared</label>
+
+            <input type="hidden" id="regionId" name="regionId" />
+
+            <button type="submit" id="saveMarker">Save</button>
+            <button type="button" id="cancelMarker">Cancel</button>
+        </form>
+    </div>
 
     <script type="text/javascript">
 
@@ -48,9 +69,10 @@
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
 
-        const landmarksResult = @Html.Raw(ViewBag.LandmarksJson);
-        console.log(landmarksResult)
-        const geoJsonlandmarks = landmarksResult.map(landmark => ({
+        const landmarksRaw = @Html.Raw(ViewBag.LandmarksJson);
+        const regionsRaw = @Html.Raw(ViewBag.RegionJson);
+
+        const geoJsonlandmarks = landmarksRaw.map(landmark => ({
             type: "Feature",
             properties: {
                 id: landmark.Id,
@@ -67,10 +89,48 @@
             }
         }));
 
+        const geoJsonRegions = regionsRaw.map(region => ({
+            type: "Feature",
+            properties: {
+                regionId: region.RegionId,
+                name: region.Name,
+                ukrName: region.UkrName,
+                colorPalette: region.ColorPalette,
+                status: region.Status
+            },
+            geometry: {
+                type: "Polygon",
+                coordinates: JSON.parse(region.Coordinates)
+            }
+        }));
+
+        // 
+        const regionLayer = L.geoJson(geoJsonRegions, {
+            style: (feature) => ({
+                color: "#808080",  
+                weight: 2,         
+                fillOpacity: 0
+            })
+        }).addTo(map);
+
+        function findRegionByCoords(lat, lng) {
+            let foundRegion = null;
+            regionLayer.eachLayer(layer => {
+                if (layer.feature.geometry.type === "Polygon") {
+                    const polygon = layer.getLatLngs();
+                    if (L.polygon(polygon).getBounds().contains(L.latLng(lat, lng))) {
+                        foundRegion = layer.feature.properties.regionId;
+                    }
+                }
+            });
+            return foundRegion;
+        }
+
         const landmarks = L.geoJson(geoJsonlandmarks, {
         }).addTo(map);
 
         const sidebar = document.getElementById("sidebar");
+        const landmarkForm = document.getElementById("landmarkForm");
         let currentMarker = null;
 
         map.on("click", function (e) {
@@ -83,10 +143,40 @@
 
             // Создаем маркер в месте клика
             currentMarker = L.marker([lat, lng]).addTo(map);
+            const regionId = findRegionByCoords(lat, lng);
 
+            document.getElementById("coordinates").value = JSON.stringify([lat, lng]);
+            document.getElementById("regionId").value = regionId || "";
             // Показываем боковую панель
             sidebar.style.display = "flex";
 
         });
+
+        landmarkForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            
+            const formData = {
+                name: document.getElementById("name").value,
+                description: document.getElementById("description").value,
+                coordinates: document.getElementById("coordinates").value,
+                isShared: document.getElementById("isShared").checked,
+                regionId: document.getElementById("regionId").value
+            };
+
+            const response = await fetch("/Landmark/Create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert(data.message); 
+                sidebar.style.display = "none";
+            } else {
+                alert("Error: " + data.message);
+            }
+            
+        }
     </script>
 </body>

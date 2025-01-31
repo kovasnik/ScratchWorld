@@ -14,7 +14,9 @@ namespace ScratchWorld.Helper
             CreateMap<User, AddDataViewModel>();
             CreateMap<DetailViewModel, User>();
             CreateMap<User, DetailViewModel>();
-            CreateMap<LandmarkViewModel, Landmark>();
+            CreateMap<LandmarkViewModel, Landmark>()
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description != null))
+                .ForMember(dest => dest.IsApproved, opt => opt.MapFrom(_ => false));
             CreateMap<RegionSettingsViewModel, RegionSettings>();
             CreateMap<Region, MapViewModel>()
                 .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.Id))

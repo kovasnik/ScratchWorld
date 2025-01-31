@@ -6,7 +6,6 @@ namespace ScratchWorld.ViewModels
 {
     public class LandmarkViewModel
     {
-        [Required]
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
@@ -16,7 +15,7 @@ namespace ScratchWorld.ViewModels
         [Required]
         public int RegionId { get; set; }
         [Required]
-        public bool IsShated { get; set; }
+        public bool IsShared { get; set; }
         [Required]
         public string UserId { get; set; }
     }
