@@ -23,16 +23,22 @@ namespace ScratchWorld.BLL.Services
             _mapper = mapper;
         }
 
-        public async Task CreateLandmarkAsync(LandmarkViewModel landmarkViewModel)
+        public async Task CreateLandmarkAsync(LandmarkViewModel landmarkViewModel, ClaimsPrincipal user)
         {
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                throw new UnauthorizedAccessException("Не удалось определить пользователя.");
+            }
+            landmarkViewModel.UserId = userId;
             var newLandmark = _mapper.Map<Landmark>(landmarkViewModel);
 
             await _landmarkRepository.AddAsync(newLandmark);
         }
 
-        public async Task DeleteLandmarkAsync(LandmarkViewModel landmarkViewModel)
+        public async Task DeleteLandmarkAsync(int landmarkId)
         {
-            var landmark = await _landmarkRepository.FindLandmarkByIdAsync(landmarkViewModel.Id);
+            var landmark = await _landmarkRepository.FindLandmarkByIdAsync(landmarkId);
             await _landmarkRepository.DeleteAsync(landmark);
         }
 
@@ -73,9 +79,16 @@ namespace ScratchWorld.BLL.Services
             return await _landmarkRepository.GetUsersLandmarksAsync(currentUser.Id);
         }
 
-        public async Task UpdateLandmarkAsync(LandmarkViewModel landmarkViewModel)
+        public async Task UpdateLandmarkAsync(LandmarkViewModel landmarkViewModel, ClaimsPrincipal user)
         {
             var landmark = await _landmarkRepository.FindLandmarkByIdAsync(landmarkViewModel.Id);
+
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                throw new UnauthorizedAccessException("Не удалось определить пользователя.");
+            }
+            landmarkViewModel.UserId = userId;
 
             _mapper.Map(landmarkViewModel, landmark);
 

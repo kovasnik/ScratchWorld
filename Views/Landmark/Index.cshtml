@@ -35,9 +35,10 @@
 <body>
     <div class="mapcontainer "><div id="map"></div></div>
     <div id="sidebar">
-        <h3>Add Landmark</h3>
+        
 
         <form id="landmarkForm">
+            <h3>Add Landmark</h3>
 
             <label for="name">Name:</label>
             <input type="text" id="name" name="name"/>
@@ -55,7 +56,42 @@
             <button type="submit" id="saveMarker">Save</button>
             <button type="button" id="cancelMarker">Cancel</button>
         </form>
+
+        <div id="viewMode">
+            <h3 id="landmarkTitle"></h3>
+            <p id="landmarkDescription"></p>
+            <p><strong>Coordinates:</strong> <span id="landmarkCoordinates"></span></p>
+            <p><strong>Shared:</strong> <span id="landmarkShared"></span></p>
+            <p><strong>Region:</strong> <span id="landmarkRegion"></span></p>
+            <button type="button" id="editMarker">Edit</button>
+            <button type="button" id="deleteMarker">Delete</button>
+        </div>
+
+        <!-- Форма редактирования -->
+        <form id="editMode" style="display: none;">
+            <h3>Edit Landmark</h3>
+
+            <label for="name">Name:</label>
+            <input type="text" id="editName" name="editName" />
+
+            <label for="description">Description:</label>
+            <textarea id="editDescription" name="editDescription"></textarea>
+
+            <label for="coordinates">Coordinates:</label>
+            <input type="text" id="editCoordinates" name="editCoordinates" readonly />
+
+            <input type="checkbox" id="editIsShared" name="editIsShared" />
+            <label for="isShared">Shared</label>
+
+            <input type="hidden" id="editRegionId" name="editRegionId" />
+            <input type="hidden" id="landmarkId" name="landmarkId" />
+
+            <button type="submit" id="updateMarker">Update</button>
+            <button type="button" id="cancelEdit">Cancel</button>
+        </form>
     </div>
+
+
 
     <script type="text/javascript">
 
@@ -71,23 +107,6 @@
 
         const landmarksRaw = @Html.Raw(ViewBag.LandmarksJson);
         const regionsRaw = @Html.Raw(ViewBag.RegionJson);
-
-        const geoJsonlandmarks = landmarksRaw.map(landmark => ({
-            type: "Feature",
-            properties: {
-                id: landmark.Id,
-                name: landmark.Name,
-                regionId: landmark.RegionId,
-                description: landmark.Description,
-                isApproved: landmark.IsApproved,
-                isShared: landmark.IsShared,
-                userId: landmark.UserId
-            },
-            geometry: {
-                type: "Point",
-                coordinates: JSON.parse(landmark.Coordinates)
-            }
-        }));
 
         const geoJsonRegions = regionsRaw.map(region => ({
             type: "Feature",
@@ -126,35 +145,54 @@
             return foundRegion;
         }
 
-        const landmarks = L.geoJson(geoJsonlandmarks, {
-        }).addTo(map);
+        const landmarksLayer = L.layerGroup().addTo(map); 
+        let shadowMarker = null;
+        landmarksRaw.forEach(landmark => {
+            const coordinates = JSON.parse(landmark.Coordinates); 
+            const marker = L.marker(coordinates, { id: landmark.Id }).addTo(landmarksLayer);
+
+            marker.on("click", () => {
+                if (currentMarker) {
+                    map.removeLayer(currentMarker);
+                }
+                currentMarker = marker; 
+                showLandmarkDetails(landmark);
+                shadowMarker = marker;
+                currentMarker = null
+            });
+        });
 
         const sidebar = document.getElementById("sidebar");
         const landmarkForm = document.getElementById("landmarkForm");
+        const viewMode = document.getElementById("viewMode");
+        const editMode = document.getElementById("editMode");
+        const editButton = document.getElementById("editMarker");
+        const deleteButton = document.getElementById("deleteMarker");
+        const cancelEdit = document.getElementById("cancelEdit");
+
         let currentMarker = null;
 
         map.on("click", function (e) {
             const { lat, lng } = e.latlng;
 
-            // Если уже есть временный маркер, убираем его
             if (currentMarker) {
                 map.removeLayer(currentMarker);
             }
-
-            // Создаем маркер в месте клика
+            
             currentMarker = L.marker([lat, lng]).addTo(map);
             const regionId = findRegionByCoords(lat, lng);
-
             document.getElementById("coordinates").value = JSON.stringify([lat, lng]);
             document.getElementById("regionId").value = regionId || "";
-            // Показываем боковую панель
-            sidebar.style.display = "flex";
+
+            landmarkForm.style.display = "block";
+            sidebar.style.display = "block";
+            viewMode.style.display = "none";
 
         });
 
         landmarkForm.addEventListener("submit", async (event) => {
             event.preventDefault();
-            
+
             const formData = {
                 name: document.getElementById("name").value,
                 description: document.getElementById("description").value,
@@ -171,12 +209,91 @@
 
             const data = await response.json();
             if (response.ok) {
-                alert(data.message); 
+                console.log(data.message);
                 sidebar.style.display = "none";
+                const newMarker = L.marker(JSON.parse(formData.coordinates)).addTo(landmarksLayer);
             } else {
-                alert("Error: " + data.message);
+                console.log("Error: " + data.message);
             }
-            
+        });
+
+        function showLandmarkDetails(landmark) {
+            landmarkForm.style.display = "none"
+
+            document.getElementById("landmarkTitle").innerText = landmark.Name;
+            document.getElementById("landmarkDescription").innerText = landmark.Description;
+            document.getElementById("landmarkCoordinates").innerText = landmark.Coordinates;
+            document.getElementById("landmarkShared").innerText = landmark.IsShared ? "Yes" : "No";
+            document.getElementById("landmarkRegion").innerText = landmark.RegionId || "Unknown";
+
+            document.getElementById("editName").value = landmark.Name;
+            document.getElementById("editDescription").value = landmark.Description;
+            document.getElementById("editCoordinates").value = landmark.Coordinates;
+            document.getElementById("editIsShared").checked = landmark.IsShared;
+            document.getElementById("editRegionId").value = landmark.RegionId || "";
+            document.getElementById("landmarkId").value = landmark.Id;
+
+            viewMode.style.display = "block";
+            editMode.style.display = "none";
+            sidebar.style.display = "block";
         }
+
+        editMode.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const formData = {
+                id: document.getElementById("landmarkId").value,
+                name: document.getElementById("editName").value,
+                description: document.getElementById("editDescription").value,
+                coordinates: document.getElementById("editCoordinates").value,
+                isShared: document.getElementById("editIsShared").checked,
+                regionId: document.getElementById("editRegionId").value
+            };
+            console.log(formData)
+            const response = await fetch("/Landmark/Update", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                console.log("Landmark updated successfully");
+                // need to add updated data view
+                
+                sidebar.style.display = "none"; 
+            } else {
+                console.log("Error updating landmark");
+            }
+        });
+
+        editButton.addEventListener("click", () => {
+            viewMode.style.display = "none";  
+            editMode.style.display = "block";
+        });
+
+        cancelEdit.addEventListener("click", () => {
+            editMode.style.display = "none"; 
+            viewMode.style.display = "block"; 
+        });
+
+        deleteButton.addEventListener("click", async () => {
+            console.log(shadowMarker.options.id)
+            if (!shadowMarker) return;
+            const landmarkId = shadowMarker.options.id;
+
+            const response = await fetch("/Landmark/Delete", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ landmarkId })
+            });
+
+            if (response.ok) {
+                map.removeLayer(shadowMarker);
+                sidebar.style.display = "none"; 
+                console.log("Landmark deleted successfully");
+            } else {
+                console.log("Error deleting landmark");
+            }
+        });
     </script>
 </body>

@@ -34,7 +34,7 @@ namespace ScratchWorld.Controllers
             {
                 return BadRequest(new { message = "Invalid data" }); 
             }
-            await _landmarkService.CreateLandmarkAsync(viewModel);
+            await _landmarkService.CreateLandmarkAsync(viewModel, User);
             return Ok(new { message = "Landmark created successfully" });
         }
 
@@ -45,15 +45,16 @@ namespace ScratchWorld.Controllers
             {
                 return BadRequest("Invalid data");
             }
-            await _landmarkService.UpdateLandmarkAsync(viewModel);
+            await _landmarkService.UpdateLandmarkAsync(viewModel, User);
             return Ok("Landmark ");
         }
 
 
         [HttpDelete("Delete")]
-        public async Task<IActionResult> DeleteLandmark([FromBody] LandmarkViewModel viewModel)
+        public async Task<IActionResult> DeleteLandmark([FromBody] DeleteLandmark deleteLandmark)
         {
-            await _landmarkService.DeleteLandmarkAsync(viewModel);
+
+            await _landmarkService.DeleteLandmarkAsync(deleteLandmark.LandmarkId);
             return Ok("Landmark ");
         }
     }
