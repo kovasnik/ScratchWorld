@@ -7,5 +7,6 @@ namespace ScratchWorld.BLL.Interfaces
     {
         Task<List<MapViewModel>> GetRegionsForUserAsync(ClaimsPrincipal user);
         Task UpdateRegionForUserAsync(ClaimsPrincipal user, RegionSettingsViewModel viewModel);
+        Task<List<MapViewModel>> GetRegionsAsync();
     }
 }

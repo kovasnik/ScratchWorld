@@ -10,9 +10,9 @@ namespace ScratchWorld.BLL.Interfaces
         Task<IEnumerable<Landmark>> GetUsersLandmarksAsync(ClaimsPrincipal user);
         Task<IEnumerable<Landmark>> GetSharedAsync();
         Task<IEnumerable<Landmark>> GetLikedAsync(int likeCount);
-        Task CreateLandmarkAsync(LandmarkViewModel landmarkViewModel);
-        Task DeleteLandmarkAsync(LandmarkViewModel landmarkViewModel);
-        Task UpdateLandmarkAsync(LandmarkViewModel landmarkViewModel);
+        Task CreateLandmarkAsync(LandmarkViewModel landmarkViewModel, ClaimsPrincipal claimsPrincipal);
+        Task DeleteLandmarkAsync(int landmarkId);
+        Task UpdateLandmarkAsync(LandmarkViewModel landmarkViewModel, ClaimsPrincipal claimsPrincipal);
 
     }
 }
