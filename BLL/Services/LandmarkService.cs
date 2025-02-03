@@ -23,7 +23,7 @@ namespace ScratchWorld.BLL.Services
             _mapper = mapper;
         }
 
-        public async Task CreateLandmarkAsync(LandmarkViewModel landmarkViewModel, ClaimsPrincipal user)
+        public async Task<int> CreateLandmarkAsync(LandmarkViewModel landmarkViewModel, ClaimsPrincipal user)
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
@@ -34,6 +34,7 @@ namespace ScratchWorld.BLL.Services
             var newLandmark = _mapper.Map<Landmark>(landmarkViewModel);
 
             await _landmarkRepository.AddAsync(newLandmark);
+            return newLandmark.Id;
         }
 
         public async Task DeleteLandmarkAsync(int landmarkId)
