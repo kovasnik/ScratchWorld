@@ -34,8 +34,8 @@ namespace ScratchWorld.Controllers
             {
                 return BadRequest(new { message = "Invalid data" }); 
             }
-            await _landmarkService.CreateLandmarkAsync(viewModel, User);
-            return Ok(new { message = "Landmark created successfully" });
+            var newLandmarkId = await _landmarkService.CreateLandmarkAsync(viewModel, User);
+            return Ok(new { message = "Landmark created successfully", id = newLandmarkId });
         }
 
         [HttpPut("Update")]

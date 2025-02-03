@@ -171,10 +171,8 @@
         const cancelEdit = document.getElementById("cancelEdit");
 
         let currentMarker = null;
-
         map.on("click", function (e) {
             const { lat, lng } = e.latlng;
-
             if (currentMarker) {
                 map.removeLayer(currentMarker);
             }
@@ -211,7 +209,25 @@
             if (response.ok) {
                 console.log(data.message);
                 sidebar.style.display = "none";
-                const newMarker = L.marker(JSON.parse(formData.coordinates)).addTo(landmarksLayer);
+
+                const newMarker = L.marker(JSON.parse(formData.coordinates), { id: data.id }).addTo(landmarksLayer);
+                newMarker.on("click", () => {
+                    showLandmarkDetails({
+                        Id: data.id,
+                        Name: formData.name,
+                        Description: formData.description,
+                        Coordinates: formData.coordinates,
+                        IsShared: formData.isShared,
+                        RegionId: formData.regionId
+                    });
+                    if (currentMarker) {
+                        map.removeLayer(currentMarker);
+                    }
+                    currentMarker = newMarker
+                    shadowMarker = newMarker;
+                    currentMarker = null
+                });
+                
             } else {
                 console.log("Error: " + data.message);
             }
@@ -258,9 +274,17 @@
 
             if (response.ok) {
                 console.log("Landmark updated successfully");
-                // need to add updated data view
-                
-                sidebar.style.display = "none"; 
+                const updatedLandmark = landmarksRaw.find(l => l.Id == formData.id);
+                if (updatedLandmark) {
+                    updatedLandmark.Name = formData.name;
+                    updatedLandmark.Description = formData.description;
+                    updatedLandmark.Coordinates = formData.coordinates;
+                    updatedLandmark.IsShared = formData.isShared;
+                }
+
+                editMode.style.display = "none";
+                sidebar.style.display = "none";
+
             } else {
                 console.log("Error updating landmark");
             }
